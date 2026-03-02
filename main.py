@@ -6,11 +6,15 @@ from selenium.webdriver.support import expected_conditions as EC
 from bs4 import BeautifulSoup
 import csv
 import time
+import pandas as pd
 from selenium.webdriver.firefox.options import Options
 
-option = Options()
-option.headless = True
-driver = webdriver.Firefox(options=option) #Ouverture page unique
+########################################
+# A DECOMMENTER POUR LA PARTIE SCRAPING#
+########################################
+#option = Options()
+#option.headless = True
+#driver = webdriver.Firefox(options=option) #Ouverture page unique
 URL = "https://www.millesima.fr/"
 
 # Question 1 : recup la soup de la page
@@ -192,6 +196,25 @@ def fill_csv():
 
     driver.quit()
 
+
+# Question 8 :
+# VERIFIER LES DONNEES ? COMMENT CA ?
+vins = pd.read_csv('wine.csv')
+
+# Question 9 :
+# SRC : https://stackoverflow.com/questions/13413590/how-to-drop-rows-of-pandas-dataframe-whose-value-in-a-certain-column-is-nan
+# Ca NE modifie PAS le fichier csv !
+
+vins = vins.dropna(subset=['Appelation'])
+for i in vins["Appelation"]:
+    print(i)
+
+
+# Question 10 : (Deja traitee plus haut en realite)
+for i in vins["Prix"]:
+    if type(i) is not float:
+        print("Error!")
+
 # Tests
 # print(informations(getsoup("https://www.millesima.fr/chateau-gloria-2016.html")))
 # print(f"Prix : {prix(getsoup("https://www.millesima.fr/chateau-citran-2018.html"))}") # OK
@@ -199,14 +222,14 @@ def fill_csv():
 # print(f"Rating parker : {parker(getsoup("https://www.millesima.fr/chateau-lafite-rothschild-2000.html"))}")
 # print(f"Robinson rate : {robinson(getsoup("https://www.millesima.fr/chateau-lafite-rothschild-2000.html"))}")
 # print(f"Suckling rate : {suckling(getsoup("https://www.millesima.fr/chateau-lafite-rothschild-2000.html"))}")
-#print(f"Rating parker : {parker(getsoup("https://www.millesima.fr/chateau-peyrabon-2019.html"))}")
+# print(f"Rating parker : {parker(getsoup("https://www.millesima.fr/chateau-peyrabon-2019.html"))}")
 # fill_csv()
-#print(note("90-93+/100")) Existe avec - et + ???
+# print(note("90-93+/100")) Existe avec - et + ???
 # print(note("17/20"))
 # print(note("1/20"))
 # print(note("1/100"))
 # print(note("90+/100"))
-fill_csv()
+# fill_csv()
 # print(note("90-93/100"))
 
 # print(appellation(getsoup("https://www.millesima.fr/chateau-gloria-2016.html")))
