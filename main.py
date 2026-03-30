@@ -263,8 +263,116 @@ print(vins)
 ## Question 14 :
 vins = pd.get_dummies(vins, prefix='App', dtype = int)
 print(vins)
-print(vins.shape) # OK selon le sujet
-print(vins.dtypes) # Valeurs bien numeriques
+#print(vins.shape) # OK selon le sujet
+#print(vins.dtypes) # Valeurs bien numeriques
+
+
+## Question 15 :
+from sklearn.model_selection import train_test_split
+from sklearn.linear_model import LinearRegression
+from sklearn.metrics import r2_score
+
+X_train, X_test, y_train, y_test = train_test_split(
+    # Tous sauf le prix
+    vins.drop(columns=["Prix"]), vins['Prix'], train_size=0.75, random_state=49
+)
+
+print(f"Train size : {X_train.shape}")
+print(f"Test size : {X_test.shape}")
+
+
+## Question 16
+model_lR = LinearRegression()
+model_lR.fit(X_train, y_train)
+y_pred = model_lR.predict(X_test)
+
+print(f"r2 score : {model_lR.score(X_test, y_test)}")
+
+
+
+## Question 17
+import matplotlib.pyplot as plt
+
+def afficherSchema(y_pred, y_test):
+    plt.figure(figsize=(10,6))
+    plt.scatter(y_pred, y_test)
+
+    plt.plot([y_test.min(), y_test.max()],
+            [y_test.min(), y_test.max()])
+
+    plt.xlabel("estim_LR (prédictions)")
+    plt.ylabel("y_test (valeurs réelles)")
+    plt.title("Régression linéaire : prédictions vs valeurs réelles")
+
+    plt.show()
+
+#afficherSchema(y_pred ,y_test)
+# Constat : C'est tres moche
+
+## Question 18 :
+
+# Normaliser avec MinMaxScaler()
+from sklearn.pipeline import make_pipeline
+from sklearn.preprocessing import MinMaxScaler
+from sklearn.preprocessing import StandardScaler
+
+model_lR_normal = make_pipeline(MinMaxScaler(),  LinearRegression())
+model_lR_normal.fit(X_train, y_train)
+y_pred = model_lR_normal.predict(X_test)
+
+print(f"r2 score (_lR_normal): {model_lR_normal.score(X_test, y_test)}")
+
+#afficherSchema(y_pred, y_test)
+# Rien n'a change
+
+# Standard
+model_lR_stand = make_pipeline(StandardScaler(),  LinearRegression())
+model_lR_stand.fit(X_train, y_train)
+y_pred = model_lR_stand.predict(X_test)
+
+print(f"r2 score (_lR_stand): {model_lR_stand.score(X_test, y_test)}")
+
+#afficherSchema(y_pred, y_test)
+# Rien n'a change
+
+## Question 19 :
+import numpy as np
+print(f"Prix min : {vins['Prix'].min()}")
+print(f"Prix max : {vins['Prix'].max()}")
+# Grosse dispertion !
+
+y_log = np.log(vins["Prix"])
+print(f"Prix min (log) : {np.log(vins['Prix']).min()}")
+print(f"Prix max (log) : {np.log(vins['Prix']).max()}")
+
+## Question 20 :
+X_train, X_test, y_train, y_test = train_test_split(
+    # Tous sauf le prix
+    vins.drop(columns=["Prix"]), y_log, train_size=0.75, random_state=49
+)
+# LR
+model_lR_log = LinearRegression()
+model_lR_log.fit(X_train, y_train)
+y_pred = model_lR_log.predict(X_test)
+
+print(f"r2 score : {model_lR_log.score(X_test, y_test)}")
+#afficherSchema(y_pred, y_test)
+
+# LR Normal
+model_lR_normal_log = make_pipeline(MinMaxScaler(),  LinearRegression())
+model_lR_normal_log.fit(X_train, y_train)
+y_pred = model_lR_normal_log.predict(X_test)
+
+print(f"r2 score (_lR_normal_log): {model_lR_normal_log.score(X_test, y_test)}")
+afficherSchema(y_pred, y_test)
+
+# LR Standard
+model_lR_stand_log = make_pipeline(StandardScaler(),  LinearRegression())
+model_lR_stand_log.fit(X_train, y_train)
+y_pred = model_lR_stand_log.predict(X_test)
+
+print(f"r2 score (_lR_stand_log): {model_lR_stand_log.score(X_test, y_test)}")
+#afficherSchema(y_pred, y_test)
 
 
 
